@@ -106,7 +106,7 @@ function App() {
           </div>
         ))}
         <div>
-          <h3>Distance Matrix (in meter):</h3>
+          <h3>Distance Matrix:</h3>
           <table className="matrix">
             <tbody>
               {adjMatrix.map((row, rowIndex) => (
