@@ -82,7 +82,7 @@ function App() {
         ))}
         <Polyline positions={polyLines} weight={4} color="blue" />
         <LocateSelf markers={markers} setMarkers={setMarkers} />
-        {!saveMarkers && markers.length < 3 ? (
+        {!saveMarkers && markers.length < 10 ? (
           <ClickHandler markers={markers} setMarkers={setMarkers} />
         ) : null}
       </MapContainer>
