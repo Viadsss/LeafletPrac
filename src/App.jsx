@@ -1,7 +1,13 @@
-import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
+import {
+  MapContainer,
+  Marker,
+  Polyline,
+  Popup,
+  TileLayer,
+} from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { useState } from "react";
-import { LocateSelf, ClickHandler } from "./mapUtils";
+import { LocateSelf, ClickHandler, calculateDistance } from "./mapUtils";
 import { Icon } from "leaflet";
 import MapIcon from "/Map-Marker.svg";
 
@@ -12,10 +18,54 @@ const customIcon = new Icon({
 
 function App() {
   const [markers, setMarkers] = useState([]);
+  const [saveMarkers, setSaveMarkers] = useState(false);
+  const [polyLines, setPolylines] = useState([]);
+  const [adjMatrix, setAdjMatrix] = useState([]);
 
-  const handleMarkerAdd = (newMarker) => {
-    setMarkers([...markers, newMarker]);
-    console.log([...markers, newMarker]);
+  const handleSaveMarkers = () => {
+    setSaveMarkers(true);
+  };
+
+  const handleClearMarkers = () => {
+    setSaveMarkers(false);
+    setMarkers([]);
+    setPolylines([]);
+  };
+
+  const handleProcessMarkers = (markers) => {
+    let lines = [];
+    let matrix = [];
+    const len = markers.length;
+
+    // For PolyLines
+    for (let i = 0; i < len; i++) {
+      for (let j = i + 1; j < len; j++) {
+        lines.push([markers[i].geoCode, markers[j].geoCode]);
+      }
+    }
+
+    // For Adjacency Matrix
+    for (let i = 0; i < markers.length; i++) {
+      let rows = [];
+      for (let j = 0; j < markers.length; j++) {
+        if (i > j) {
+          rows.push(matrix[j][i]); // Mirror the value
+        } else {
+          const lat1 = markers[i].geoCode[0];
+          const lng1 = markers[i].geoCode[1];
+          const lat2 = markers[j].geoCode[0];
+          const lng2 = markers[j].geoCode[1];
+          const distance = calculateDistance(lat1, lng1, lat2, lng2);
+          rows.push(i === j ? 0 : distance);
+        }
+      }
+      matrix.push(rows);
+    }
+
+    setPolylines(lines);
+    setAdjMatrix(matrix);
+    console.log(lines);
+    console.log(matrix);
   };
 
   return (
@@ -30,10 +80,23 @@ function App() {
             <Popup>{marker.popUp}</Popup>
           </Marker>
         ))}
-        <LocateSelf markers={markers} onMarkerAdd={handleMarkerAdd} />
-        <ClickHandler markers={markers} onMarkerAdd={handleMarkerAdd} />
+        <Polyline positions={polyLines} weight={4} color="blue" />
+        <LocateSelf markers={markers} setMarkers={setMarkers} />
+        {!saveMarkers ? (
+          <ClickHandler markers={markers} setMarkers={setMarkers} />
+        ) : null}
       </MapContainer>
       <div>
+        <button onClick={handleSaveMarkers} disabled={markers.length < 2}>
+          Save Markers
+        </button>
+        <button onClick={handleClearMarkers}>Clear Markers</button>
+        <button
+          onClick={() => handleProcessMarkers(markers)}
+          disabled={!saveMarkers}
+        >
+          Process Markers
+        </button>
         {markers.map((marker, index) => (
           <div key={index}>
             <h2>{marker.popUp}:</h2>
