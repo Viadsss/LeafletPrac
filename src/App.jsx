@@ -82,7 +82,7 @@ function App() {
         ))}
         <Polyline positions={polyLines} weight={4} color="blue" />
         <LocateSelf markers={markers} setMarkers={setMarkers} />
-        {!saveMarkers ? (
+        {!saveMarkers && markers.length < 3 ? (
           <ClickHandler markers={markers} setMarkers={setMarkers} />
         ) : null}
       </MapContainer>
@@ -105,6 +105,20 @@ function App() {
             <br />
           </div>
         ))}
+        <div>
+          <h3>Distance Matrix (in meter):</h3>
+          <table className="matrix">
+            <tbody>
+              {adjMatrix.map((row, rowIndex) => (
+                <tr key={rowIndex}>
+                  {row.map((value, colIndex) => (
+                    <td key={colIndex}>{value.toFixed(3)}</td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
