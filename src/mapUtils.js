@@ -32,31 +32,36 @@ function ClickHandler({ markers, setMarkers }) {
         popUp: `Marker ${markers.length + 1}`,
       };
       setMarkers([...markers, newMarker]);
-      console.log([...markers, newMarker]);
     },
   });
 
   return null;
 }
 
-function calculateDistance(lat1, lon1, lat2, lon2) {
-  const earthRadius = 6371; // Earth's radius in kilometers
+function createDistanceMatrix(routes) {
+  const lastRoute = routes.length - 1;
+  const lastRouteDest = routes[lastRoute].dest;
+  const matrixSize = lastRouteDest + 1;
 
-  // Convert latitude and longitude from degrees to radians
-  const dLat = (lat2 - lat1) * (Math.PI / 180);
-  const dLon = (lon2 - lon1) * (Math.PI / 180);
+  // Initialize a matrix with zeros
+  const matrix = Array.from(Array(matrixSize), () => Array(matrixSize).fill(0));
 
-  // Calculate the distance using the Haversine formula
-  const a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(lat1 * (Math.PI / 180)) *
-      Math.cos(lat2 * (Math.PI / 180)) *
-      Math.sin(dLon / 2) *
-      Math.sin(dLon / 2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  const distance = earthRadius * c;
+  routes.forEach((route) => {
+    const { src, dest, distance } = route;
+    matrix[src][dest] = distance;
+    matrix[dest][src] = distance;
+  });
 
-  return distance; // Distance in kilometers
+  return matrix;
+}
+
+function getRandomColor() {
+  const letters = "0123456789ABCDEF";
+  let color = "#";
+  for (let i = 0; i < 6; i++) {
+    color += letters[Math.floor(Math.random() * 16)];
+  }
+  return color;
 }
 
 LocateSelf.propTypes = {
@@ -69,4 +74,4 @@ ClickHandler.propTypes = {
   setMarkers: PropTypes.func.isRequired,
 };
 
-export { LocateSelf, ClickHandler, calculateDistance };
+export { LocateSelf, ClickHandler, createDistanceMatrix, getRandomColor };

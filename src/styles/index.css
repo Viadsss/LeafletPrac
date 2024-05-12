@@ -41,3 +41,11 @@
 .matrix tr:hover {
   background-color: #ddd;
 }
+
+.belowMap {
+  z-index: -5;
+}
+
+.defaultMap {
+  z-index: 0;
+}
