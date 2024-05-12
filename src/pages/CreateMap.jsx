@@ -5,6 +5,14 @@ import { ClickHandler, LocateSelf, createDistanceMatrix } from "../mapUtils";
 import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
 import PropTypes from "prop-types";
 import LocationModal from "../components/LocationModal";
+import markerIconPng from "leaflet/dist/images/marker-icon.png";
+import { Icon } from "leaflet";
+
+const icon = new Icon({
+  iconUrl: markerIconPng,
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+});
 
 export default function CreateMap({ center, limit }) {
   const [markers, setMarkers] = useState([]);
@@ -123,7 +131,7 @@ export default function CreateMap({ center, limit }) {
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
             {markers.map((marker, index) => (
-              <Marker position={marker.geoCode} key={index}>
+              <Marker position={marker.geoCode} icon={icon} key={index}>
                 <Popup>{marker.popUp}</Popup>
               </Marker>
             ))}
